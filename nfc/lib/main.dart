@@ -1,5 +1,7 @@
-import 'package:english_words/english_words.dart';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:nfc_manager/nfc_manager.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -25,30 +27,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyAppState extends ChangeNotifier {
-  var current = WordPair.random();
-  void getNext() {
-    current = WordPair.random();
-    notifyListeners();
-  }
-
-  var favorites = <WordPair>[];
-  void toggleFavorite() {
-    if (favorites.contains(current)) {
-      favorites.remove(current);
-    } else {
-      favorites.add(current);
-    }
-    notifyListeners();
-  }
-
-  void removeFavorite(value) {
-    if (favorites.contains(value)) {
-      favorites.remove(value);
-      notifyListeners();
-    }
-  }
-}
+class MyAppState extends ChangeNotifier {}
 
 class MyHomePage extends StatefulWidget {
   @override
@@ -56,153 +35,113 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  var selectedIndex = 0;
+  ValueNotifier<dynamic> result = ValueNotifier(null);
   @override
   Widget build(BuildContext context) {
-    Widget page;
-    switch (selectedIndex) {
-      case 0:
-        page = GeneratorPage();
-      case 1:
-        page = FavouritePage();
-      default:
-        throw UnimplementedError('no widget for $selectedIndex');
-    }
     return LayoutBuilder(builder: (context, constraints) {
       return Scaffold(
-        body: Row(
-          children: [
-            SafeArea(
-              child: NavigationRail(
-                extended: constraints.maxWidth >= 600,
-                destinations: [
-                  NavigationRailDestination(
-                    icon: Icon(Icons.home),
-                    label: Text('Home'),
-                  ),
-                  NavigationRailDestination(
-                    icon: Icon(Icons.favorite),
-                    label: Text('Favorites'),
-                  ),
-                ],
-                selectedIndex: selectedIndex,
-                onDestinationSelected: (value) {
-                  setState(() {
-                    selectedIndex = value;
-                  });
-                },
-              ),
-            ),
-            Expanded(
-              child: Container(
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  child: page),
-            ),
-          ],
-        ),
-      );
+          body: SafeArea(
+              child: FutureBuilder<bool>(
+                  future: NfcManager.instance.isAvailable(),
+                  builder: (context, ss) => ss.data != true
+                      ? Center(
+                          child: Text("NfcManager.isAvailable(): ${ss.data}"))
+                      : Flex(
+                          direction: Axis.vertical,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Flexible(
+                              flex: 2,
+                              child: Container(
+                                margin: EdgeInsets.all(4),
+                                constraints: BoxConstraints.expand(),
+                                decoration: BoxDecoration(border: Border.all()),
+                                child: SingleChildScrollView(
+                                  child: ValueListenableBuilder<dynamic>(
+                                      valueListenable: result,
+                                      builder: (context, value, _) =>
+                                          Text('${value ?? ''}')),
+                                ),
+                              ),
+                            ),
+                            Flexible(
+                              flex: 3,
+                              child: GridView.count(
+                                crossAxisCount: 2,
+                                padding: EdgeInsets.all(4),
+                                childAspectRatio: 4,
+                                crossAxisSpacing: 4,
+                                mainAxisSpacing: 4,
+                                children: [
+                                  ElevatedButton(
+                                      onPressed: _tagRead,
+                                      child: Text("Tag Read")),
+                                  ElevatedButton(
+                                      onPressed: _ndefWrite,
+                                      child: Text("Ndef Write")),
+                                  ElevatedButton(
+                                      onPressed: _ndefWriteLock,
+                                      child: Text("Ndef Write Lock"))
+                                ],
+                              ),
+                            )
+                          ],
+                        ))));
     });
   }
-}
 
-class GeneratorPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    var appState = context.watch<MyAppState>();
-    var pair = appState.current;
-
-    IconData icon;
-    if (appState.favorites.contains(pair)) {
-      icon = Icons.favorite;
-    } else {
-      icon = Icons.favorite_border;
-    }
-
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          BigCard(pair: pair),
-          SizedBox(height: 10),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ElevatedButton.icon(
-                onPressed: () {
-                  appState.toggleFavorite();
-                },
-                icon: Icon(icon),
-                label: Text('Like'),
-              ),
-              SizedBox(width: 10),
-              ElevatedButton(
-                onPressed: () {
-                  appState.getNext();
-                },
-                child: Text('Next'),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
+  void _tagRead() {
+    NfcManager.instance.startSession(onDiscovered: (NfcTag tag) async {
+      result.value = tag.data;
+      NfcManager.instance.stopSession();
+    });
   }
-}
 
-class FavouritePage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    var theme = Theme.of(context);
-    var appState = context.watch<MyAppState>();
-    if (appState.favorites.isEmpty) {
-      return Center(
-        child: Text("No favourites yet."),
-      );
-    }
-    return ListView(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: Text("You have ${appState.favorites.length} favourites:"),
-        ),
-        for (var pair in appState.favorites)
-          ListTile(
-            leading: IconButton(
-              icon: Icon(Icons.delete),
-              color: theme.colorScheme.primary,
-              onPressed: () {
-                appState.removeFavorite(pair);
-              },
-            ),
-            title: Text(pair.asLowerCase),
-          )
-      ],
-    );
+  void _ndefWrite() {
+    NfcManager.instance.startSession(onDiscovered: (NfcTag tag) async {
+      var ndef = Ndef.from(tag);
+      if (ndef == null || !ndef.isWritable) {
+        result.value = "Tag is not ndef writable";
+        NfcManager.instance.stopSession(errorMessage: result.value.toString());
+        return;
+      }
+      NdefMessage msg = NdefMessage([
+        NdefRecord.createText("Hello World!"),
+        NdefRecord.createUri(Uri.parse("https://flutter.dev")),
+        NdefRecord.createMime(
+            'text/plain', Uint8List.fromList('Hello'.codeUnits)),
+        NdefRecord.createExternal(
+            'com.example', 'mytype', Uint8List.fromList('mydata'.codeUnits))
+      ]);
+      try {
+        await ndef.write(msg);
+        result.value = 'Success to "Ndef Write"';
+        NfcManager.instance.stopSession();
+      } catch (e) {
+        result.value = e;
+        NfcManager.instance.stopSession(errorMessage: result.value.toString());
+        return;
+      }
+    });
   }
-}
 
-class BigCard extends StatelessWidget {
-  const BigCard({
-    super.key,
-    required this.pair,
-  });
-
-  final WordPair pair;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final textStyle = theme.textTheme.labelSmall!
-        .copyWith(color: theme.colorScheme.onPrimary);
-    return Card(
-      color: theme.colorScheme.primary,
-      child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Text(
-            pair.asLowerCase,
-            style: textStyle,
-            semanticsLabel: "${pair.first} ${pair.second}",
-          )),
-    );
+  void _ndefWriteLock() {
+    NfcManager.instance.startSession(onDiscovered: (NfcTag tag) async {
+      var ndef = Ndef.from(tag);
+      if (ndef == null) {
+        result.value = "Tag is not ndef";
+        NfcManager.instance.stopSession(errorMessage: result.value.toString());
+        return;
+      }
+      try {
+        await ndef.writeLock();
+        result.value = 'Success to "Ndef Write Lock"';
+        NfcManager.instance.stopSession();
+      } catch (e) {
+        result.value = e;
+        NfcManager.instance.stopSession(errorMessage: result.value.toString());
+        return;
+      }
+    });
   }
 }
