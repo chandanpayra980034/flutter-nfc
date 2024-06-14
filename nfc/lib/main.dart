@@ -1,8 +1,10 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:nfc_manager/nfc_manager.dart';
 import 'package:provider/provider.dart';
+import 'package:local_auth/local_auth.dart';
 
 void main() {
   runApp(MyApp());
@@ -35,59 +37,121 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  ValueNotifier<dynamic> result = ValueNotifier(null);
+  late final LocalAuthentication auth;
+  bool _isSupportedFingerPrint = false;
+  bool _isAuthenticated = false;
+  @override
+  void initState() {
+    super.initState();
+    auth = LocalAuthentication();
+    auth.isDeviceSupported().then((bool isSupported) => setState(() {
+          _isSupportedFingerPrint = isSupported;
+        }));
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
       return Scaffold(
           body: SafeArea(
-              child: FutureBuilder<bool>(
-                  future: NfcManager.instance.isAvailable(),
-                  builder: (context, ss) => ss.data != true
-                      ? Center(
-                          child: Text("NfcManager.isAvailable(): ${ss.data}"))
-                      : Flex(
-                          direction: Axis.vertical,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Flexible(
-                              flex: 2,
-                              child: Container(
-                                margin: EdgeInsets.all(4),
-                                constraints: BoxConstraints.expand(),
-                                decoration: BoxDecoration(border: Border.all()),
-                                child: SingleChildScrollView(
-                                  child: ValueListenableBuilder<dynamic>(
-                                      valueListenable: result,
-                                      builder: (context, value, _) =>
-                                          Text('${value ?? ''}')),
-                                ),
-                              ),
-                            ),
-                            Flexible(
-                              flex: 3,
-                              child: GridView.count(
-                                crossAxisCount: 2,
-                                padding: EdgeInsets.all(4),
-                                childAspectRatio: 4,
-                                crossAxisSpacing: 4,
-                                mainAxisSpacing: 4,
-                                children: [
-                                  ElevatedButton(
-                                      onPressed: _tagRead,
-                                      child: Text("Tag Read")),
-                                  ElevatedButton(
-                                      onPressed: _ndefWrite,
-                                      child: Text("Ndef Write")),
-                                  ElevatedButton(
-                                      onPressed: _ndefWriteLock,
-                                      child: Text("Ndef Write Lock"))
-                                ],
-                              ),
-                            )
-                          ],
-                        ))));
+              child: _isAuthenticated
+                  ? NFCPage()
+                  : Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        if (_isSupportedFingerPrint)
+                          const Text(
+                              "This device is supported biometric authentication.")
+                        else
+                          const Text(
+                              "This device is not supported biometric authentication."),
+                        const Divider(height: 40),
+                        ElevatedButton(
+                            onPressed: _authenticate,
+                            child: const Text("Authenticate Biometric"))
+                      ],
+                    )));
     });
+  }
+
+  // Future<void> _getAvailableBiometrics() async {
+  //   List<BiometricType> list = await auth.getAvailableBiometrics();
+  //   print("List of available biometrics : $list");
+  //   if (!mounted) return;
+  // }
+
+  Future<void> _authenticate() async {
+    try {
+      bool authenticate = await auth.authenticate(
+        localizedReason: "Please authenticate to access NFC",
+        options: const AuthenticationOptions(
+            stickyAuth: true, biometricOnly: false, useErrorDialogs: false),
+      );
+      setState(() {
+        _isAuthenticated = authenticate;
+      });
+      print(authenticate);
+    } on PlatformException catch (e) {
+      setState(() {
+        _isAuthenticated = false;
+      });
+      print(e);
+    }
+  }
+}
+
+class NFCPage extends StatefulWidget {
+  @override
+  State<NFCPage> createState() => _NFCPage();
+}
+
+class _NFCPage extends State<NFCPage> {
+  ValueNotifier<dynamic> result = ValueNotifier(null);
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<bool>(
+        future: NfcManager.instance.isAvailable(),
+        builder: (context, ss) => ss.data != true
+            ? Center(child: Text("NfcManager.isAvailable(): ${ss.data}"))
+            : Flex(
+                direction: Axis.vertical,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Flexible(
+                    flex: 2,
+                    child: Container(
+                      margin: EdgeInsets.all(4),
+                      constraints: BoxConstraints.expand(),
+                      decoration: BoxDecoration(border: Border.all()),
+                      child: SingleChildScrollView(
+                        child: ValueListenableBuilder<dynamic>(
+                            valueListenable: result,
+                            builder: (context, value, _) =>
+                                Text('${value ?? ''}')),
+                      ),
+                    ),
+                  ),
+                  Flexible(
+                    flex: 3,
+                    child: GridView.count(
+                      crossAxisCount: 2,
+                      padding: EdgeInsets.all(4),
+                      childAspectRatio: 4,
+                      crossAxisSpacing: 4,
+                      mainAxisSpacing: 4,
+                      children: [
+                        ElevatedButton(
+                            onPressed: _tagRead, child: Text("Tag Read")),
+                        ElevatedButton(
+                            onPressed: _ndefWrite, child: Text("Ndef Write")),
+                        ElevatedButton(
+                            onPressed: _ndefWriteLock,
+                            child: Text("Ndef Write Lock"))
+                      ],
+                    ),
+                  )
+                ],
+              ));
   }
 
   void _tagRead() {
