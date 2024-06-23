@@ -66,10 +66,10 @@ packages:
     dependency: "direct dev"
     description:
       name: flutter_lints
-      sha256: a25a15ebbdfc33ab1cd26c63a6ee519df92338a9c10f122adda92938253bef04
+      sha256: "3f41d009ba7172d5ff9be5f6e6e6abb4300e263aab8866d2a0842ed2a70f8f0c"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.3"
+    version: "4.0.0"
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:
@@ -83,6 +83,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  font_awesome_flutter:
+    dependency: "direct main"
+    description:
+      name: font_awesome_flutter
+      sha256: "275ff26905134bcb59417cf60ad979136f1f8257f2f449914b2c3e05bbb4cd6f"
+      url: "https://pub.dev"
+    source: hosted
+    version: "10.7.0"
   intl:
     dependency: transitive
     description:
@@ -119,10 +127,10 @@ packages:
     dependency: transitive
     description:
       name: lints
-      sha256: "0a217c6c989d21039f1498c3ed9f3ed71b354e69873f13a8dfc3c9fe76f1b452"
+      sha256: "976c774dd944a42e83e2467f4cc670daef7eed6295b10b36ae8c85bcbf828235"
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.1"
+    version: "4.0.0"
   local_auth:
     dependency: "direct main"
     description:
@@ -135,10 +143,10 @@ packages:
     dependency: transitive
     description:
       name: local_auth_android
-      sha256: "48dfb2d954da8ef6a77adfc93a29998f7729e9308eaa817e91dea4500317b2c8"
+      sha256: b77dc490fef9214e785c326bf11fa733feaa47675d0433f05f48b5caa486c8f7
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.39"
+    version: "1.0.40"
   local_auth_darwin:
     dependency: transitive
     description:
