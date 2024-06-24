@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:local_auth/local_auth.dart';
 import 'package:namer_app/widgets/nfc_info.dart';
 
 class NFC extends StatefulWidget {
@@ -7,6 +9,16 @@ class NFC extends StatefulWidget {
 }
 
 class _NFC extends State<NFC> {
+  late final LocalAuthentication auth;
+  @override
+  void initState() {
+    super.initState();
+    auth = LocalAuthentication();
+    auth.isDeviceSupported().then((bool isSupported) => {
+          if (isSupported) {_authenticate()}
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -167,5 +179,22 @@ class _NFC extends State<NFC> {
         builder: (context) => NFCInformation(type: type),
       ),
     );
+  }
+
+  Future<void> _authenticate() async {
+    try {
+      bool isAuthenticate = await auth.authenticate(
+        localizedReason: "Please authenticate to access NFC",
+        options: const AuthenticationOptions(
+            stickyAuth: true, biometricOnly: false, useErrorDialogs: true),
+      );
+      if (isAuthenticate) {
+        await auth.stopAuthentication();
+      } else {
+        _authenticate();
+      }
+    } on PlatformException catch (e) {
+      print(e);
+    }
   }
 }

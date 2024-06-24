@@ -29,8 +29,7 @@ class MyApp extends StatelessWidget {
           ),
           routes: {
             "/": (context) => NFC(),
-            "/nfc": (context) => Authentication(),
-            "/nfc_info": (context) => NFCInformation(type: "DEFAULT")
+            "/nfc_info": (context) => NFCInformation(type: "")
           }),
     );
   }
