@@ -116,6 +116,9 @@ class NfcTagData {
   final String isExtendedLengthSupported;
   final String maxTransceiveLength;
   final String hiLayerResponse;
+  final String? writable;
+  final String? readonly;
+  final String? size;
 
   NfcTagData({
     required this.tagId,
@@ -128,7 +131,10 @@ class NfcTagData {
     required this.timeout,
     required this.isExtendedLengthSupported,
     required this.maxTransceiveLength,
-    required this.hiLayerResponse
+    required this.hiLayerResponse,
+    this.writable,
+    this.readonly,
+    this.size
   });
 
   @override
@@ -228,15 +234,24 @@ ValueNotifier<dynamic> result = ValueNotifier(null);
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                 
-                // if(result.value!=null)
+                  Center(
+                    child: Container(
+                         margin: EdgeInsets.only(top: 15),
+                          child:ElevatedButton(
+                            onPressed: _tagRead, child: Text("Tag Read")),
+                        )
+                  ),
                 ValueListenableBuilder(
-  valueListenable: result,
-  builder: (context, dynamic tagType, child) {
-    if (tagType != null && tagType is NfcTagData) {
-               return Visibility(
-                visible:true,
-                child: 
-                Container(
+            valueListenable: result,
+                 builder: (context, dynamic tagType, child) {
+                     if (tagType != null && tagType is NfcTagData) {
+                    return  Container(
+                    height: 760, 
+                    
+            
+                child: SingleChildScrollView(
+                    child:Container(
+                  padding: EdgeInsets.all(6),
                    width: double.infinity, // Full width
                    margin: EdgeInsets.all(8), // Margin around the container
                    decoration: BoxDecoration(
@@ -252,7 +267,7 @@ ValueNotifier<dynamic> result = ValueNotifier(null);
                      ],
                   ),
                  child: Padding(
-                 padding: EdgeInsets.all(8.0),
+                 padding: EdgeInsets.all(0.0),
                  child: Column(
                  crossAxisAlignment: CrossAxisAlignment.start, // Aligns children to the left
                   children: [
@@ -264,7 +279,7 @@ ValueNotifier<dynamic> result = ValueNotifier(null);
                                     copyText: result.value != null && result.value is NfcTagData
                                                ? (result.value as NfcTagData).tagType ?? 'Unknown' : 'Unknown',
                                         ),
-                                       Divider(height: 10),
+                                      //  Divider(height: 5),
                                         CustomRow(
                                     icon: FontAwesomeIcons.microchip, // Use a FontAwesome icon here
                                     label: 'Technologies available',
@@ -273,7 +288,7 @@ ValueNotifier<dynamic> result = ValueNotifier(null);
                                     copyText:  result.value != null && result.value is NfcTagData
                                            ? (result.value as NfcTagData).techList.join(', ') : '',
                                         ),
-                                         Divider(height: 10),
+                                        //  Divider(height: 5),
                                         CustomRow(
                                     icon: FontAwesomeIcons.key, // Use a FontAwesome icon here
                                     label: 'Serial Number',
@@ -282,7 +297,7 @@ ValueNotifier<dynamic> result = ValueNotifier(null);
                                     copyText: result.value != null && result.value is NfcTagData
                                                ? (result.value as NfcTagData).serialNumber ?? '' : '',
                                         ),
-                                         Divider(height: 10),
+                                        //  Divider(height: 5),
                                          CustomRow(
                                     icon: FontAwesomeIcons.a, // Use a FontAwesome icon here
                                     label: 'ATQA',
@@ -291,7 +306,7 @@ ValueNotifier<dynamic> result = ValueNotifier(null);
                                     copyText: result.value != null && result.value is NfcTagData
                                                ? (result.value as NfcTagData).atqa ?? '' : '',
                                         ),
-                                         Divider(height: 10),
+                                        //  Divider(height: 5),
                                         CustomRow(
                                     icon: FontAwesomeIcons.s, // Use a FontAwesome icon here
                                     label: 'SAK',
@@ -300,7 +315,7 @@ ValueNotifier<dynamic> result = ValueNotifier(null);
                                     copyText: result.value != null && result.value is NfcTagData
                                                ? (result.value as NfcTagData).sak ?? '' : '',
                                         ),
-                                         Divider(height: 10),
+                                        //  Divider(height: 5),
                                          CustomRow(
                                     icon: FontAwesomeIcons.h, // Use a FontAwesome icon here
                                     label: 'Historical bytes',
@@ -309,7 +324,7 @@ ValueNotifier<dynamic> result = ValueNotifier(null);
                                     copyText: result.value != null && result.value is NfcTagData
                                                ? (result.value as NfcTagData).historicalBytes ?? '' : '',
                                         ),
-                                         Divider(height: 10),
+                                        //  Divider(height: 5),
                                          CustomRow(
                                     icon: FontAwesomeIcons.clock, // Use a FontAwesome icon here
                                     label: 'Timeout',
@@ -318,7 +333,7 @@ ValueNotifier<dynamic> result = ValueNotifier(null);
                                     copyText: result.value != null && result.value is NfcTagData
                                                ? (result.value as NfcTagData).timeout ?? '' : '',
                                         ),
-                                         Divider(height: 10),
+                                        //  Divider(height: 5),
                                         CustomRow(
                                     icon: FontAwesomeIcons.e, // Use a FontAwesome icon here
                                     label: 'Extended Length Apdu Supported',
@@ -327,7 +342,7 @@ ValueNotifier<dynamic> result = ValueNotifier(null);
                                     copyText: result.value != null && result.value is NfcTagData
                                                ? (result.value as NfcTagData).isExtendedLengthSupported ?? '' : '',
                                         ),
-                                         Divider(height: 10),
+                                        //  Divider(height: 5),
                                         CustomRow(
                                     icon: FontAwesomeIcons.m, // Use a FontAwesome icon here
                                     label: 'Max Transceive Length',
@@ -336,7 +351,7 @@ ValueNotifier<dynamic> result = ValueNotifier(null);
                                     copyText: result.value != null && result.value is NfcTagData
                                                ? (result.value as NfcTagData).maxTransceiveLength ?? '' : '',
                                         ),
-                                         Divider(height: 10),
+                                        //  Divider(height: 5),
                                          CustomRow(
                                     icon: FontAwesomeIcons.h, // Use a FontAwesome icon here
                                     label: 'Hi Layer Response',
@@ -345,6 +360,56 @@ ValueNotifier<dynamic> result = ValueNotifier(null);
                                     copyText: result.value != null && result.value is NfcTagData
                                                ? (result.value as NfcTagData).hiLayerResponse ?? '' : '',
                                         ),
+
+                                         ValueListenableBuilder(
+                                          valueListenable: result,
+                                          builder: (context, dynamic writable, child) {
+                                         if ((result.value as NfcTagData).techList.contains('NDEF')) {
+                                         return  CustomRow(
+                                            icon: FontAwesomeIcons.w, // Use a FontAwesome icon here
+                                            label: 'Writable',
+                                              value: result.value != null && result.value is NfcTagData
+                                                      ? (result.value as NfcTagData).writable ?? '' : '',
+                                            copyText: result.value != null && result.value is NfcTagData
+                                               ? (result.value as NfcTagData).writable ?? '' : '',
+                                               );
+                                         }
+                                         else{
+                                          return Container();
+                                         }}),
+                                         ValueListenableBuilder(
+                                          valueListenable: result,
+                                          builder: (context, dynamic writable, child) {
+                                         if ((result.value as NfcTagData).techList.contains('NDEF')) {
+                                         return  CustomRow(
+                                            icon: FontAwesomeIcons.c, // Use a FontAwesome icon here
+                                            label: 'Can Be Made Read Only',
+                                              value: result.value != null && result.value is NfcTagData
+                                                      ? (result.value as NfcTagData).readonly ?? '' : '',
+                                            copyText: result.value != null && result.value is NfcTagData
+                                               ? (result.value as NfcTagData).readonly ?? '' : '',
+                                               );
+                                         }
+                                         else{
+                                          return Container();
+                                         }}),
+
+                                         ValueListenableBuilder(
+                                          valueListenable: result,
+                                          builder: (context, dynamic writable, child) {
+                                         if ((result.value as NfcTagData).techList.contains('NDEF')) {
+                                         return  CustomRow(
+                                            icon: FontAwesomeIcons.s, // Use a FontAwesome icon here
+                                            label: 'Size',
+                                              value: result.value != null && result.value is NfcTagData
+                                                      ? (result.value as NfcTagData).size ?? '' : '',
+                                            copyText: result.value != null && result.value is NfcTagData
+                                               ? (result.value as NfcTagData).size ?? '' : '',
+                                               );
+                                         }
+                                         else{
+                                          return Container();
+                                         }})
                             
                            
                
@@ -354,34 +419,36 @@ ValueNotifier<dynamic> result = ValueNotifier(null);
                              ],
                 ),
                 )
-                )
               
-                );
+                )
+              )
+                    );
                 }
                 else {
               return Container(); // or some other loading indicator
                  }
                 }),
+              
   
-                  Flexible(
-                    flex: 3,
-                    child: GridView.count(
-                      crossAxisCount: 2,
-                      padding: EdgeInsets.all(4),
-                      childAspectRatio: 4,
-                      crossAxisSpacing: 4,
-                      mainAxisSpacing: 4,
-                      children: [
-                        ElevatedButton(
-                            onPressed: _tagRead, child: Text("Tag Read")),
-                        ElevatedButton(
-                            onPressed: _ndefWrite, child: Text("Ndef Write")),
-                        ElevatedButton(
-                            onPressed: _ndefWriteLock,
-                            child: Text("Ndef Write Lock"))
-                      ],
-                    ),
-                  )
+                  // Flexible(
+                  //   flex: 3,
+                  //   child: GridView.count(
+                  //     crossAxisCount: 2,
+                  //     padding: EdgeInsets.all(4),
+                  //     childAspectRatio: 4,
+                  //     crossAxisSpacing: 4,
+                  //     mainAxisSpacing: 4,
+                  //     children: [
+                  //       ElevatedButton(
+                  //           onPressed: _tagRead, child: Text("Tag Read")),
+                  //       ElevatedButton(
+                  //           onPressed: _ndefWrite, child: Text("Ndef Write")),
+                  //       ElevatedButton(
+                  //           onPressed: _ndefWriteLock,
+                  //           child: Text("Ndef Write Lock"))
+                  //     ],
+                  //   ),
+                  // )
                 ],
               ));
   }
@@ -426,7 +493,7 @@ ValueNotifier<dynamic> result = ValueNotifier(null);
       for (int byte in historicalBytes) {
         formattedBytes += byte.toRadixString(16).padLeft(2, '0').toUpperCase();
       }
-      formattedBytes += 's@'; // Add additional characters as needed
+      formattedBytes += ''; // Add additional characters as needed
     } else {
       formattedBytes = 'Unknown'; // Handle case where historicalBytes is not available
     }
@@ -441,6 +508,20 @@ ValueNotifier<dynamic> result = ValueNotifier(null);
       var extendedLengthSupported= _extractisExtendedLengthApduSupported(tag);
       var maxTransceiveLength= _extractmaxTransceiveLength(tag);
       var hiLayerResponse= _extractHiLayerResponse(tag);
+       var isWritable= "";
+       var makeReadOnly="";
+       var size="";
+       if(techList.contains('NDEF')){
+        isWritable=_extractIsWritable(tag);
+       }
+        if(techList.contains('NDEF')){
+       makeReadOnly=_extractMakeReadOnly(tag);
+       }
+        if(techList.contains('NDEF')){
+       size=_extractSize(tag);
+       }
+       
+       
     // print('maxTransceiveLength: $maxTransceiveLength');
     // Create an instance of NfcTagData
     var nfcTagData = NfcTagData(
@@ -454,7 +535,10 @@ ValueNotifier<dynamic> result = ValueNotifier(null);
       timeout:timeOut,
       isExtendedLengthSupported:extendedLengthSupported,
       maxTransceiveLength:maxTransceiveLength,
-      hiLayerResponse:hiLayerResponse
+      hiLayerResponse:hiLayerResponse,
+      writable:isWritable,
+      readonly:makeReadOnly,
+      size:size
     );
     
     // Update result.value with the NfcTagData object
@@ -575,6 +659,51 @@ String _extractATQA(NfcTag tag) {
   }
 
   return atqa;
+}
+String _extractIsWritable(NfcTag tag) {
+  var writable = '';
+
+  // Check if 'nfca' is present in tag data
+  if (tag.data.containsKey('ndef')) {
+    var ndefData = tag.data['ndef'];
+
+    // Extract ATQA if available
+    if (ndefData.containsKey('isWritable')) {
+      writable = '${ndefData['isWritable']??""}';
+    }
+  }
+
+  return writable;
+}
+String _extractMakeReadOnly(NfcTag tag) {
+  var readOnly = '';
+
+  // Check if 'nfca' is present in tag data
+  if (tag.data.containsKey('ndef')) {
+    var ndefData = tag.data['ndef'];
+
+    // Extract ATQA if available
+    if (ndefData.containsKey('canMakeReadOnly')) {
+      readOnly = '${ndefData['canMakeReadOnly']??""}';
+    }
+  }
+
+  return readOnly;
+}
+String _extractSize(NfcTag tag) {
+  var size = '';
+
+  // Check if 'nfca' is present in tag data
+  if (tag.data.containsKey('ndef')) {
+    var ndefData = tag.data['ndef'];
+
+    // Extract ATQA if available
+    if (ndefData.containsKey('maxSize')) {
+      size = '0'+' / ${ndefData['maxSize']??""} bytes';
+    }
+  }
+
+  return size;
 }
  String _getTagType(List<String> techList) {
   if (techList.contains('ISO-DEP')) {
