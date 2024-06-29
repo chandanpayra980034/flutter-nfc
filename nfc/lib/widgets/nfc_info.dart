@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:nfc_manager/nfc_manager.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
 class NFCInformation extends StatefulWidget {
   final String type;
 
@@ -12,6 +13,7 @@ class NFCInformation extends StatefulWidget {
   // ignore: library_private_types_in_public_api
   _NFCInformationState createState() => _NFCInformationState();
 }
+
 class NfcTagData {
   final String tagId;
   final List<String> techList;
@@ -124,413 +126,352 @@ class CustomRow extends StatelessWidget {
   }
 }
 
-
 class _NFCInformationState extends State<NFCInformation> {
-   ValueNotifier<dynamic> result = ValueNotifier(null);
-   BuildContext? bottomSheetContext;
+  ValueNotifier<dynamic> result = ValueNotifier(null);
+  BuildContext? bottomSheetContext;
   @override
   void initState() {
     super.initState();
     Future.delayed(Duration(seconds: 0)).then((_) {
-     _showBottomDialog(context, true);
-     widget.type=="Write Tags"?_ndefWrite():_tagRead();
-       
+      _showBottomDialog(context, true);
+      widget.type == "Write Tags" ? _ndefWrite() : _tagRead();
     });
   }
- 
-  
 
   @override
   Widget build(BuildContext context) {
-                 return 
-                 
-                      ValueListenableBuilder(
-                      valueListenable: result,
-                      builder: (context, dynamic tagType, child) {
-                        if (tagType != null && tagType is NfcTagData) {
-                          return
-                          Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: Text(
-          widget.type,
-          style: TextStyle(color: Colors.black),
-        ),
-        backgroundColor: Colors.white,
-        iconTheme:
-            IconThemeData(color: Colors.black), // Set the icon color to black
-      ),
-      body: 
-                          Container(
-                              // height: 760,
-                              child: SingleChildScrollView(
-                                  child: Container(
-                                      padding: EdgeInsets.all(6),
-                                      width: double.infinity, // Full width
-                                      margin: EdgeInsets.all(
-                                          8), // Margin around the container
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey[200],
-                                        borderRadius: BorderRadius.circular(
-                                            8), // Rounded corners
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.grey.withOpacity(
-                                                0.5), // Shadow color
-                                            spreadRadius: 2, // Spread radius
-                                            blurRadius: 2, // Blur radius
-                                            offset: Offset(0,
-                                                1), // Offset from the top left
-                                          ),
-                                        ],
-                                      ),
-                                      child: Padding(
-                                        padding: EdgeInsets.all(0.0),
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment
-                                              .start, // Aligns children to the left
-                                          children: [
-                                            CustomRow(
-                                              icon: FontAwesomeIcons
-                                                  .tag, // Use a FontAwesome icon here
-                                              label: 'Tag type',
-                                              value: result.value != null &&
-                                                      result.value is NfcTagData
-                                                  ? (result.value as NfcTagData)
-                                                          .tagType ??
-                                                      'Unknown'
-                                                  : 'Unknown',
-                                              copyText: result.value != null &&
-                                                      result.value is NfcTagData
-                                                  ? (result.value as NfcTagData)
-                                                          .tagType ??
-                                                      'Unknown'
-                                                  : 'Unknown',
-                                            ),
-                                            //  Divider(height: 5),
-                                            CustomRow(
-                                              icon: FontAwesomeIcons
-                                                  .microchip, // Use a FontAwesome icon here
-                                              label: 'Technologies available',
-                                              value: result.value != null &&
-                                                      result.value is NfcTagData
-                                                  ? (result.value as NfcTagData)
-                                                      .techList
-                                                      .join(', ')
-                                                  : '',
-                                              copyText: result.value != null &&
-                                                      result.value is NfcTagData
-                                                  ? (result.value as NfcTagData)
-                                                      .techList
-                                                      .join(', ')
-                                                  : '',
-                                            ),
-                                            //  Divider(height: 5),
-                                            CustomRow(
-                                              icon: FontAwesomeIcons
-                                                  .key, // Use a FontAwesome icon here
-                                              label: 'Serial Number',
-                                              value: result.value != null &&
-                                                      result.value is NfcTagData
-                                                  ? (result.value as NfcTagData)
-                                                          .serialNumber ??
-                                                      ''
-                                                  : '',
-                                              copyText: result.value != null &&
-                                                      result.value is NfcTagData
-                                                  ? (result.value as NfcTagData)
-                                                          .serialNumber ??
-                                                      ''
-                                                  : '',
-                                            ),
-                                            //  Divider(height: 5),
-                                            CustomRow(
-                                              icon: FontAwesomeIcons
-                                                  .a, // Use a FontAwesome icon here
-                                              label: 'ATQA',
-                                              value: result.value != null &&
-                                                      result.value is NfcTagData
-                                                  ? (result.value as NfcTagData)
-                                                          .atqa ??
-                                                      ''
-                                                  : '',
-                                              copyText: result.value != null &&
-                                                      result.value is NfcTagData
-                                                  ? (result.value as NfcTagData)
-                                                          .atqa ??
-                                                      ''
-                                                  : '',
-                                            ),
-                                            //  Divider(height: 5),
-                                            CustomRow(
-                                              icon: FontAwesomeIcons
-                                                  .s, // Use a FontAwesome icon here
-                                              label: 'SAK',
-                                              value: result.value != null &&
-                                                      result.value is NfcTagData
-                                                  ? (result.value as NfcTagData)
-                                                          .sak ??
-                                                      ''
-                                                  : '',
-                                              copyText: result.value != null &&
-                                                      result.value is NfcTagData
-                                                  ? (result.value as NfcTagData)
-                                                          .sak ??
-                                                      ''
-                                                  : '',
-                                            ),
-                                            //  Divider(height: 5),
-                                            CustomRow(
-                                              icon: FontAwesomeIcons
-                                                  .h, // Use a FontAwesome icon here
-                                              label: 'Historical bytes',
-                                              value: result.value != null &&
-                                                      result.value is NfcTagData
-                                                  ? (result.value as NfcTagData)
-                                                          .historicalBytes ??
-                                                      ''
-                                                  : '',
-                                              copyText: result.value != null &&
-                                                      result.value is NfcTagData
-                                                  ? (result.value as NfcTagData)
-                                                          .historicalBytes ??
-                                                      ''
-                                                  : '',
-                                            ),
-                                            //  Divider(height: 5),
-                                            CustomRow(
-                                              icon: FontAwesomeIcons
-                                                  .clock, // Use a FontAwesome icon here
-                                              label: 'Timeout',
-                                              value: result.value != null &&
-                                                      result.value is NfcTagData
-                                                  ? (result.value as NfcTagData)
-                                                          .timeout ??
-                                                      ''
-                                                  : '',
-                                              copyText: result.value != null &&
-                                                      result.value is NfcTagData
-                                                  ? (result.value as NfcTagData)
-                                                          .timeout ??
-                                                      ''
-                                                  : '',
-                                            ),
-                                            //  Divider(height: 5),
-                                            CustomRow(
-                                              icon: FontAwesomeIcons
-                                                  .e, // Use a FontAwesome icon here
-                                              label:
-                                                  'Extended Length Apdu Supported',
-                                              value: result.value != null &&
-                                                      result.value is NfcTagData
-                                                  ? (result.value as NfcTagData)
-                                                          .isExtendedLengthSupported ??
-                                                      ''
-                                                  : '',
-                                              copyText: result.value != null &&
-                                                      result.value is NfcTagData
-                                                  ? (result.value as NfcTagData)
-                                                          .isExtendedLengthSupported ??
-                                                      ''
-                                                  : '',
-                                            ),
-                                            //  Divider(height: 5),
-                                            CustomRow(
-                                              icon: FontAwesomeIcons
-                                                  .m, // Use a FontAwesome icon here
-                                              label: 'Max Transceive Length',
-                                              value: result.value != null &&
-                                                      result.value is NfcTagData
-                                                  ? (result.value as NfcTagData)
-                                                          .maxTransceiveLength ??
-                                                      ''
-                                                  : '',
-                                              copyText: result.value != null &&
-                                                      result.value is NfcTagData
-                                                  ? (result.value as NfcTagData)
-                                                          .maxTransceiveLength ??
-                                                      ''
-                                                  : '',
-                                            ),
-                                            //  Divider(height: 5),
-                                            CustomRow(
-                                              icon: FontAwesomeIcons
-                                                  .h, // Use a FontAwesome icon here
-                                              label: 'Hi Layer Response',
-                                              value: result.value != null &&
-                                                      result.value is NfcTagData
-                                                  ? (result.value as NfcTagData)
-                                                          .hiLayerResponse ??
-                                                      ''
-                                                  : '',
-                                              copyText: result.value != null &&
-                                                      result.value is NfcTagData
-                                                  ? (result.value as NfcTagData)
-                                                          .hiLayerResponse ??
-                                                      ''
-                                                  : '',
-                                            ),
+    return ValueListenableBuilder(
+        valueListenable: result,
+        builder: (context, dynamic tagType, child) {
+          if (tagType != null && tagType is NfcTagData) {
+            return Scaffold(
+                backgroundColor: Colors.grey[100],
+                appBar: AppBar(
+                  title: Text(
+                    widget.type,
+                    style: TextStyle(color: Colors.black),
+                  ),
+                  backgroundColor: Colors.white,
+                  iconTheme: IconThemeData(
+                      color: Colors.black), // Set the icon color to black
+                ),
+                body: Container(
+                    // height: 760,
+                    child: SingleChildScrollView(
+                        child: Container(
+                            padding: EdgeInsets.all(6),
+                            width: double.infinity, // Full width
+                            margin: EdgeInsets.all(
+                                8), // Margin around the container
+                            decoration: BoxDecoration(
+                              color: Colors.grey[200],
+                              borderRadius:
+                                  BorderRadius.circular(8), // Rounded corners
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey
+                                      .withOpacity(0.5), // Shadow color
+                                  spreadRadius: 2, // Spread radius
+                                  blurRadius: 2, // Blur radius
+                                  offset:
+                                      Offset(0, 1), // Offset from the top left
+                                ),
+                              ],
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.all(0.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment
+                                    .start, // Aligns children to the left
+                                children: [
+                                  CustomRow(
+                                    icon: FontAwesomeIcons
+                                        .tag, // Use a FontAwesome icon here
+                                    label: 'Tag type',
+                                    value: result.value != null &&
+                                            result.value is NfcTagData
+                                        ? (result.value as NfcTagData)
+                                                .tagType ??
+                                            'Unknown'
+                                        : 'Unknown',
+                                    copyText: result.value != null &&
+                                            result.value is NfcTagData
+                                        ? (result.value as NfcTagData)
+                                                .tagType ??
+                                            'Unknown'
+                                        : 'Unknown',
+                                  ),
+                                  //  Divider(height: 5),
+                                  CustomRow(
+                                    icon: FontAwesomeIcons
+                                        .microchip, // Use a FontAwesome icon here
+                                    label: 'Technologies available',
+                                    value: result.value != null &&
+                                            result.value is NfcTagData
+                                        ? (result.value as NfcTagData)
+                                            .techList
+                                            .join(', ')
+                                        : '',
+                                    copyText: result.value != null &&
+                                            result.value is NfcTagData
+                                        ? (result.value as NfcTagData)
+                                            .techList
+                                            .join(', ')
+                                        : '',
+                                  ),
+                                  //  Divider(height: 5),
+                                  CustomRow(
+                                    icon: FontAwesomeIcons
+                                        .key, // Use a FontAwesome icon here
+                                    label: 'Serial Number',
+                                    value: result.value != null &&
+                                            result.value is NfcTagData
+                                        ? (result.value as NfcTagData)
+                                                .serialNumber ??
+                                            ''
+                                        : '',
+                                    copyText: result.value != null &&
+                                            result.value is NfcTagData
+                                        ? (result.value as NfcTagData)
+                                                .serialNumber ??
+                                            ''
+                                        : '',
+                                  ),
+                                  //  Divider(height: 5),
+                                  CustomRow(
+                                    icon: FontAwesomeIcons
+                                        .a, // Use a FontAwesome icon here
+                                    label: 'ATQA',
+                                    value: result.value != null &&
+                                            result.value is NfcTagData
+                                        ? (result.value as NfcTagData).atqa ??
+                                            ''
+                                        : '',
+                                    copyText: result.value != null &&
+                                            result.value is NfcTagData
+                                        ? (result.value as NfcTagData).atqa ??
+                                            ''
+                                        : '',
+                                  ),
+                                  //  Divider(height: 5),
+                                  CustomRow(
+                                    icon: FontAwesomeIcons
+                                        .s, // Use a FontAwesome icon here
+                                    label: 'SAK',
+                                    value: result.value != null &&
+                                            result.value is NfcTagData
+                                        ? (result.value as NfcTagData).sak ?? ''
+                                        : '',
+                                    copyText: result.value != null &&
+                                            result.value is NfcTagData
+                                        ? (result.value as NfcTagData).sak ?? ''
+                                        : '',
+                                  ),
+                                  //  Divider(height: 5),
+                                  CustomRow(
+                                    icon: FontAwesomeIcons
+                                        .h, // Use a FontAwesome icon here
+                                    label: 'Historical bytes',
+                                    value: result.value != null &&
+                                            result.value is NfcTagData
+                                        ? (result.value as NfcTagData)
+                                                .historicalBytes ??
+                                            ''
+                                        : '',
+                                    copyText: result.value != null &&
+                                            result.value is NfcTagData
+                                        ? (result.value as NfcTagData)
+                                                .historicalBytes ??
+                                            ''
+                                        : '',
+                                  ),
+                                  //  Divider(height: 5),
+                                  CustomRow(
+                                    icon: FontAwesomeIcons
+                                        .clock, // Use a FontAwesome icon here
+                                    label: 'Timeout',
+                                    value: result.value != null &&
+                                            result.value is NfcTagData
+                                        ? (result.value as NfcTagData)
+                                                .timeout ??
+                                            ''
+                                        : '',
+                                    copyText: result.value != null &&
+                                            result.value is NfcTagData
+                                        ? (result.value as NfcTagData)
+                                                .timeout ??
+                                            ''
+                                        : '',
+                                  ),
+                                  //  Divider(height: 5),
+                                  CustomRow(
+                                    icon: FontAwesomeIcons
+                                        .e, // Use a FontAwesome icon here
+                                    label: 'Extended Length Apdu Supported',
+                                    value: result.value != null &&
+                                            result.value is NfcTagData
+                                        ? (result.value as NfcTagData)
+                                                .isExtendedLengthSupported ??
+                                            ''
+                                        : '',
+                                    copyText: result.value != null &&
+                                            result.value is NfcTagData
+                                        ? (result.value as NfcTagData)
+                                                .isExtendedLengthSupported ??
+                                            ''
+                                        : '',
+                                  ),
+                                  //  Divider(height: 5),
+                                  CustomRow(
+                                    icon: FontAwesomeIcons
+                                        .m, // Use a FontAwesome icon here
+                                    label: 'Max Transceive Length',
+                                    value: result.value != null &&
+                                            result.value is NfcTagData
+                                        ? (result.value as NfcTagData)
+                                                .maxTransceiveLength ??
+                                            ''
+                                        : '',
+                                    copyText: result.value != null &&
+                                            result.value is NfcTagData
+                                        ? (result.value as NfcTagData)
+                                                .maxTransceiveLength ??
+                                            ''
+                                        : '',
+                                  ),
+                                  //  Divider(height: 5),
+                                  CustomRow(
+                                    icon: FontAwesomeIcons
+                                        .h, // Use a FontAwesome icon here
+                                    label: 'Hi Layer Response',
+                                    value: result.value != null &&
+                                            result.value is NfcTagData
+                                        ? (result.value as NfcTagData)
+                                                .hiLayerResponse ??
+                                            ''
+                                        : '',
+                                    copyText: result.value != null &&
+                                            result.value is NfcTagData
+                                        ? (result.value as NfcTagData)
+                                                .hiLayerResponse ??
+                                            ''
+                                        : '',
+                                  ),
 
-                                            ValueListenableBuilder(
-                                                valueListenable: result,
-                                                builder: (context,
-                                                    dynamic writable, child) {
-                                                  if ((result.value
-                                                          as NfcTagData)
-                                                      .techList
-                                                      .contains('NDEF')) {
-                                                    return CustomRow(
-                                                      icon: FontAwesomeIcons
-                                                          .w, // Use a FontAwesome icon here
-                                                      label: 'Writable',
-                                                      value: result.value !=
-                                                                  null &&
-                                                              result.value
-                                                                  is NfcTagData
-                                                          ? (result.value
-                                                                      as NfcTagData)
-                                                                  .writable ??
-                                                              ''
-                                                          : '',
-                                                      copyText: result.value !=
-                                                                  null &&
-                                                              result.value
-                                                                  is NfcTagData
-                                                          ? (result.value
-                                                                      as NfcTagData)
-                                                                  .writable ??
-                                                              ''
-                                                          : '',
-                                                    );
-                                                  } else {
-                                                    return Container();
-                                                  }
-                                                }),
-                                            ValueListenableBuilder(
-                                                valueListenable: result,
-                                                builder: (context,
-                                                    dynamic writable, child) {
-                                                  if ((result.value
-                                                          as NfcTagData)
-                                                      .techList
-                                                      .contains('NDEF')) {
-                                                    return CustomRow(
-                                                      icon: FontAwesomeIcons
-                                                          .c, // Use a FontAwesome icon here
-                                                      label:
-                                                          'Can Be Made Read Only',
-                                                      value: result.value !=
-                                                                  null &&
-                                                              result.value
-                                                                  is NfcTagData
-                                                          ? (result.value
-                                                                      as NfcTagData)
-                                                                  .readonly ??
-                                                              ''
-                                                          : '',
-                                                      copyText: result.value !=
-                                                                  null &&
-                                                              result.value
-                                                                  is NfcTagData
-                                                          ? (result.value
-                                                                      as NfcTagData)
-                                                                  .readonly ??
-                                                              ''
-                                                          : '',
-                                                    );
-                                                  } else {
-                                                    return Container();
-                                                  }
-                                                }),
+                                  ValueListenableBuilder(
+                                      valueListenable: result,
+                                      builder:
+                                          (context, dynamic writable, child) {
+                                        if ((result.value as NfcTagData)
+                                            .techList
+                                            .contains('NDEF')) {
+                                          return CustomRow(
+                                            icon: FontAwesomeIcons
+                                                .w, // Use a FontAwesome icon here
+                                            label: 'Writable',
+                                            value: result.value != null &&
+                                                    result.value is NfcTagData
+                                                ? (result.value as NfcTagData)
+                                                        .writable ??
+                                                    ''
+                                                : '',
+                                            copyText: result.value != null &&
+                                                    result.value is NfcTagData
+                                                ? (result.value as NfcTagData)
+                                                        .writable ??
+                                                    ''
+                                                : '',
+                                          );
+                                        } else {
+                                          return Container();
+                                        }
+                                      }),
+                                  ValueListenableBuilder(
+                                      valueListenable: result,
+                                      builder:
+                                          (context, dynamic writable, child) {
+                                        if ((result.value as NfcTagData)
+                                            .techList
+                                            .contains('NDEF')) {
+                                          return CustomRow(
+                                            icon: FontAwesomeIcons
+                                                .c, // Use a FontAwesome icon here
+                                            label: 'Can Be Made Read Only',
+                                            value: result.value != null &&
+                                                    result.value is NfcTagData
+                                                ? (result.value as NfcTagData)
+                                                        .readonly ??
+                                                    ''
+                                                : '',
+                                            copyText: result.value != null &&
+                                                    result.value is NfcTagData
+                                                ? (result.value as NfcTagData)
+                                                        .readonly ??
+                                                    ''
+                                                : '',
+                                          );
+                                        } else {
+                                          return Container();
+                                        }
+                                      }),
 
-                                            ValueListenableBuilder(
-                                                valueListenable: result,
-                                                builder: (context,
-                                                    dynamic writable, child) {
-                                                  if ((result.value
-                                                          as NfcTagData)
-                                                      .techList
-                                                      .contains('NDEF')) {
-                                                    return CustomRow(
-                                                      icon: FontAwesomeIcons
-                                                          .s, // Use a FontAwesome icon here
-                                                      label: 'Size',
-                                                      value: result.value !=
-                                                                  null &&
-                                                              result.value
-                                                                  is NfcTagData
-                                                          ? (result.value
-                                                                      as NfcTagData)
-                                                                  .size ??
-                                                              ''
-                                                          : '',
-                                                      copyText: result.value !=
-                                                                  null &&
-                                                              result.value
-                                                                  is NfcTagData
-                                                          ? (result.value
-                                                                      as NfcTagData)
-                                                                  .size ??
-                                                              ''
-                                                          : '',
-                                                    );
-                                                  } else {
-                                                    return Container();
-                                                  }
-                                                })
-                                          ],
-                                        ),
-                                      )))));
-                        } 
-                        else {
-                          return   
-                          Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: Text(
-          widget.type,
-          style: TextStyle(color: Colors.black),
-        ),
-        backgroundColor: Colors.white,
-        iconTheme:
-            IconThemeData(color: Colors.black), // Set the icon color to black
-      ),
-      body: Center(
-        child: Image.asset(
-          'lib/assets/nfc_wrap.png',
-          height: 240,
-          width: 240,
-          fit: BoxFit.cover,
-        ),
-      ),
-    );
-                        }
-                      });
-  
-
-    // Scaffold(
-    //   backgroundColor: Colors.grey[100],
-    //   appBar: AppBar(
-    //     title: Text(
-    //       widget.type,
-    //       style: TextStyle(color: Colors.black),
-    //     ),
-    //     backgroundColor: Colors.white,
-    //     iconTheme:
-    //         IconThemeData(color: Colors.black), // Set the icon color to black
-    //   ),
-    //   body: Center(
-    //     child: Image.asset(
-    //       'lib/assets/nfc_wrap.png',
-    //       height: 240,
-    //       width: 240,
-    //       fit: BoxFit.cover,
-    //     ),
-    //   ),
-    // );
+                                  ValueListenableBuilder(
+                                      valueListenable: result,
+                                      builder:
+                                          (context, dynamic writable, child) {
+                                        if ((result.value as NfcTagData)
+                                            .techList
+                                            .contains('NDEF')) {
+                                          return CustomRow(
+                                            icon: FontAwesomeIcons
+                                                .s, // Use a FontAwesome icon here
+                                            label: 'Size',
+                                            value: result.value != null &&
+                                                    result.value is NfcTagData
+                                                ? (result.value as NfcTagData)
+                                                        .size ??
+                                                    ''
+                                                : '',
+                                            copyText: result.value != null &&
+                                                    result.value is NfcTagData
+                                                ? (result.value as NfcTagData)
+                                                        .size ??
+                                                    ''
+                                                : '',
+                                          );
+                                        } else {
+                                          return Container();
+                                        }
+                                      })
+                                ],
+                              ),
+                            )))));
+          } else {
+            return Scaffold(
+              backgroundColor: Colors.grey[100],
+              appBar: AppBar(
+                title: Text(
+                  widget.type,
+                  style: TextStyle(color: Colors.black),
+                ),
+                backgroundColor: Colors.white,
+                iconTheme: IconThemeData(
+                    color: Colors.black), // Set the icon color to black
+              ),
+              body: Center(
+                child: Image.asset(
+                  'lib/assets/nfc_wrap.png',
+                  height: 240,
+                  width: 240,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            );
+          }
+        });
   }
 
-void _showBottomDialog(BuildContext context, bool isShow) {
+  void _showBottomDialog(BuildContext context, bool isShow) {
     if (isShow) {
       showModalBottomSheet(
         isDismissible: true,
@@ -577,8 +518,7 @@ void _showBottomDialog(BuildContext context, bool isShow) {
     }
   }
 
-
- @override
+  @override
   void didUpdateWidget(NFCInformation oldWidget) {
     if (oldWidget.type != widget.type) {
       _showBottomDialog(context, true);
@@ -586,12 +526,11 @@ void _showBottomDialog(BuildContext context, bool isShow) {
     super.didUpdateWidget(oldWidget);
   }
 
-
-void _tagRead() {
+  void _tagRead() {
     NfcManager.instance.startSession(onDiscovered: (NfcTag tag) async {
       // Log the entire tag data for debugging purposes
       print('Tag data: ${tag.data}');
-      
+
       // Extract the identifier from the nested structures
       var tagId = tag.data['isodep']?['identifier'] ??
           tag.data['nfca']?['identifier'] ??
@@ -686,7 +625,7 @@ void _tagRead() {
       // _showBottomDialog(context, false);
       // Stop the NFC session
       NfcManager.instance.stopSession();
-     if (bottomSheetContext != null) {
+      if (bottomSheetContext != null) {
         Navigator.of(bottomSheetContext!).pop();
         bottomSheetContext = null;
       }
@@ -853,71 +792,71 @@ void _tagRead() {
 
     // Check if 'ndef' is present in tag data
     if (tag.data.containsKey('ndef')) {
-        var ndefData = tag.data['ndef'];
+      var ndefData = tag.data['ndef'];
 
-        // Check if cachedMessage is present and has records
-        if (ndefData.containsKey('cachedMessage')) {
-            var cachedMessage = ndefData['cachedMessage'];
-            var records = cachedMessage['records'];
+      // Check if cachedMessage is present and has records
+      if (ndefData.containsKey('cachedMessage')) {
+        var cachedMessage = ndefData['cachedMessage'];
+        var records = cachedMessage['records'];
 
-            // Calculate the total length of the payloads
-            int totalLength = 0;
-            if (records is List) {
-                for (var record in records) {
-                    if (record.containsKey('payload')) {
-                        var payload = record['payload'];
-                        if (payload is List) {
-                            totalLength += payload.length;
-                        }
-                    }
-                }
+        // Calculate the total length of the payloads
+        int totalLength = 0;
+        if (records is List) {
+          for (var record in records) {
+            if (record.containsKey('payload')) {
+              var payload = record['payload'];
+              if (payload is List) {
+                totalLength += payload.length;
+              }
             }
-
-            // Extract maxSize if available
-            if (ndefData.containsKey('maxSize')) {
-                size = '${totalLength} / ${ndefData['maxSize']} bytes';
-            }
-        } else {
-            // If cachedMessage is not available, fall back to showing 0 / maxSize
-            if (ndefData.containsKey('maxSize')) {
-                size = '0 / ${ndefData['maxSize']} bytes';
-            }
+          }
         }
+
+        // Extract maxSize if available
+        if (ndefData.containsKey('maxSize')) {
+          size = '${totalLength} / ${ndefData['maxSize']} bytes';
+        }
+      } else {
+        // If cachedMessage is not available, fall back to showing 0 / maxSize
+        if (ndefData.containsKey('maxSize')) {
+          size = '0 / ${ndefData['maxSize']} bytes';
+        }
+      }
     }
 
     return size;
-}
+  }
 
-String formatNfcForumType2(NfcTag tag) {
+  String formatNfcForumType2(NfcTag tag) {
     StringBuffer buffer = StringBuffer();
 
     // Check if 'ndef' is present in tag data
     if (tag.data.containsKey('ndef')) {
-        var ndefData = tag.data['ndef'];
+      var ndefData = tag.data['ndef'];
 
-        // Check if cachedMessage is present and has records
-        if (ndefData.containsKey('cachedMessage')) {
-            var cachedMessage = ndefData['cachedMessage'];
-            var records = cachedMessage['records'];
+      // Check if cachedMessage is present and has records
+      if (ndefData.containsKey('cachedMessage')) {
+        var cachedMessage = ndefData['cachedMessage'];
+        var records = cachedMessage['records'];
 
-            if (records is List) {
-                for (var record in records) {
-                    if (record.containsKey('payload')) {
-                        var payload = record['payload'];
-                        if (payload is List) {
-                            // Format and decode each record
-                            buffer.writeln(_formatRecord(record));
-                        }
-                    }
-                }
+        if (records is List) {
+          for (var record in records) {
+            if (record.containsKey('payload')) {
+              var payload = record['payload'];
+              if (payload is List) {
+                // Format and decode each record
+                buffer.writeln(_formatRecord(record));
+              }
             }
+          }
         }
+      }
     }
 
     return buffer.toString();
-}
+  }
 
-String _formatRecord(Map<String, dynamic> record) {
+  String _formatRecord(Map<String, dynamic> record) {
     StringBuffer buffer = StringBuffer();
 
     // Extract typeNameFormat
@@ -927,28 +866,28 @@ String _formatRecord(Map<String, dynamic> record) {
     // Extract type
     var type = record['type'];
     if (type is List<int>) {
-        String typeString = String.fromCharCodes(type);
-        buffer.writeln('Type: $typeString');
+      String typeString = String.fromCharCodes(type);
+      buffer.writeln('Type: $typeString');
     }
 
     // Extract identifier
     var identifier = record['identifier'];
     if (identifier is List<int>) {
-        String identifierString = String.fromCharCodes(identifier);
-        buffer.writeln('Identifier: $identifierString');
+      String identifierString = String.fromCharCodes(identifier);
+      buffer.writeln('Identifier: $identifierString');
     }
 
     // Extract payload
     var payload = record['payload'];
     if (payload is List<int>) {
-        String payloadString = String.fromCharCodes(payload);
-        buffer.writeln('Payload: $payloadString');
+      String payloadString = String.fromCharCodes(payload);
+      buffer.writeln('Payload: $payloadString');
     }
 
     buffer.writeln();
 
     return buffer.toString();
-}
+  }
 
   String _getTagType(List<String> techList) {
     if (techList.contains('ISO-DEP')) {
@@ -1020,8 +959,3 @@ String _formatRecord(Map<String, dynamic> record) {
     });
   }
 }
-
-
-
-  // Method to show bottom dialog
- 
