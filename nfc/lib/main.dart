@@ -23,14 +23,13 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => MyAppState(),
       child: MaterialApp(
-          title: 'Namer App',
+          title: 'NFC App',
           theme: ThemeData(
             useMaterial3: true,
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
           ),
           routes: {
             "/": (context) => NFC(),
-            //  "/nfc_details": (context) => NFCdetails(),
             "/nfc_info": (context) => NFCInformation(type: "")
           }),
     );

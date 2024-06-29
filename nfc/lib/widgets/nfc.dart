@@ -65,7 +65,7 @@ class _NFC extends State<NFC> {
                       foregroundColor: Colors.black,
                       backgroundColor: Colors.white,
                       padding: EdgeInsets.symmetric(
-                          horizontal: 24.0, vertical: 16.0), // Text color
+                          horizontal: 24.0, vertical: 16.0),
                       elevation: 1,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(6),
