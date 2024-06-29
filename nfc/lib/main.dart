@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:namer_app/widgets/authentication.dart';
 import 'package:namer_app/widgets/nfc.dart';
+import 'package:namer_app/widgets/nfc_details.dart';
 import 'package:namer_app/widgets/nfc_info.dart';
 import 'package:nfc_manager/nfc_manager.dart';
 import 'package:provider/provider.dart';
@@ -29,6 +30,7 @@ class MyApp extends StatelessWidget {
           ),
           routes: {
             "/": (context) => NFC(),
+            //  "/nfc_details": (context) => NFCdetails(),
             "/nfc_info": (context) => NFCInformation(type: "")
           }),
     );
@@ -217,12 +219,12 @@ class _NFCPage extends State<NFCPage> {
                 direction: Axis.vertical,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Center(
-                      child: Container(
-                    margin: EdgeInsets.only(top: 15),
-                    child: ElevatedButton(
-                        onPressed: _tagRead, child: Text("Tag Read")),
-                  )),
+                  // Center(
+                  //     child: Container(
+                  //   margin: EdgeInsets.only(top: 15),
+                  //   child: ElevatedButton(
+                  //       onPressed: _tagRead, child: Text("Tag Read")),
+                  // )),
                   ValueListenableBuilder(
                       valueListenable: result,
                       builder: (context, dynamic tagType, child) {
